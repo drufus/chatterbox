@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY . /app
 
-# IMPORTANT: src-layout fix
+# src-layout fix
 ENV PYTHONPATH=/app/src
 
 RUN pip install --no-cache-dir -U pip \
  && pip install --no-cache-dir torch torchaudio \
  && pip install --no-cache-dir gradio numpy scipy soundfile \
- && (pip install --no-cache-dir -r requirements.txt || true)
+ && pip install --no-cache-dir -e .
 
 ENV HF_HOME=/data/hf \
     TRANSFORMERS_CACHE=/data/hf/transformers \
