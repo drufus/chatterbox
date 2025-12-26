@@ -7,7 +7,6 @@
 
 \f0\fs24 \cf0 FROM python:3.11-slim\
 \
-# Audio + build deps\
 RUN apt-get update && apt-get install -y --no-install-recommends \\\
     git \\\
     ffmpeg \\\
@@ -18,23 +17,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \\\
 WORKDIR /app\
 COPY . /app\
 \
-# Install the package + Gradio UI deps\
 RUN pip install --no-cache-dir -U pip \\\
- && pip install --no-cache-dir -e . \\\
- && pip install --no-cache-dir gradio\
+ && pip install --no-cache-dir torch torchaudio \\\
+ && pip install --no-cache-dir gradio numpy scipy soundfile \\\
+ && pip install --no-cache-dir -r requirements.txt || true\
 \
-# Persist caches if you mount /data\
+# Persist caches\
 ENV HF_HOME=/data/hf \\\
     TRANSFORMERS_CACHE=/data/hf/transformers \\\
     TORCH_HOME=/data/torch \\\
-    XDG_CACHE_HOME=/data/cache\
-\
-# Gradio bind to container network\
-ENV GRADIO_SERVER_NAME=0.0.0.0 \\\
+    XDG_CACHE_HOME=/data/cache \\\
+    GRADIO_SERVER_NAME=0.0.0.0 \\\
     GRADIO_SERVER_PORT=7860\
 \
 EXPOSE 7860\
 \
-# Choose ONE UI to run\
 CMD ["python", "gradio_tts_turbo_app.py"]\
 }
